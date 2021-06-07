@@ -4,6 +4,14 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+ # foreign_key（FK）には、@user.xxxとした際に「@user.idがfollower_idなのかfollowed_idなのか」を指定します。
+  has_many :follower, class_name: "Relationship", foreign_key: "followed_id", dependent: :destroy
+  # @user.booksのように、@user.yyyで、
+  # そのユーザがフォローしている人orフォローされている人の一覧を出したい
+  has_many :followers, through: :relationships, source: :relationship
+  has_many :followed, foreign_key: "follower_id", class_name: "Relationship", dependent: :destroy
+  has_many :followeds, through: :relationships, source: :relationship
+
   has_many :books
   attachment :profile_image, destroy: false
 
